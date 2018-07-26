@@ -58,3 +58,5 @@ class WeatherDataModel {
 //
 //    }
 }
+
+// https://github.com/londonappbrewery/Clima-iOS11
