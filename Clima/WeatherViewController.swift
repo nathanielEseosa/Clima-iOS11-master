@@ -7,7 +7,9 @@
 //
 
 import UIKit
-import CoreLocation // 1. Import the module/framework that allows us to tap into the GPS functionality of the device.
+import CoreLocation // 1. Import the module/framework that allows you to tap into the GPS functionality of the device.
+import Alamofire // 8. Import the module/framework that allows you to send a http request to web servers.
+import SwiftyJSON //
 
 // 2. Add the CLLocationManagerDelegate protocol. This makes the WeatherViewController subclass comforms to the rules of the CLLocationManagerDelegate. Now the subclass can handle location data.
 class WeatherViewController: UIViewController, CLLocationManagerDelegate {
@@ -46,7 +48,22 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the getWeatherData method here:
     
-    
+    // 10. Create the getWeatherData method. This method will use Alamofire to make a HTTP request to the web server and handle the response from the web server.
+    func getWeatherData(url: String, parameters: [String : String]) {
+        // Use the Alamofire request method to uses the given parameters for the request. You use the "get request" because you are requesting data.
+        // This Alamofire request is a Asynchrone method
+        Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
+            response in // Once the HTTP request is complete, it responds with some data and the method checks if the response (using a closure) result is success or otherwise.
+            if response.result.isSuccess {
+                print("Succes! Got the weather data")
+                
+            } else {
+                print("Error \(response.result.error!)")
+                self.cityLabel.text = "Connection Issues" // Allow the user to know if there are issues. Must use "self" because we are in a closure.
+            }
+        }
+        
+    }
     
     
     //MARK: - JSON Parsing
@@ -89,7 +106,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
             let latitude = String(location.coordinate.latitude)
             let longitude = String(location.coordinate.longitude)
             
-            let locationParameters: [String : String] = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID] // Call the keys lat, long and appid because the API requiers it
+            let locationParameters: [String : String] = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID] // Call the keys lat, long and appid because the API requiers it.
+            
+            getWeatherData(url: WEATHER_URL, parameters: locationParameters) // 9. Call the getWeatherData method although it has not been created. Create the method after this step.
             
             
         }
