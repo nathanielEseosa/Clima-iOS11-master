@@ -50,12 +50,16 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     // 10. Create the getWeatherData method. This method will use Alamofire to make a HTTP request to the web server and handle the response from the web server.
     func getWeatherData(url: String, parameters: [String : String]) {
-        // Use the Alamofire request method to uses the given parameters for the request. You use the "get request" because you are requesting data.
-        // This Alamofire request is a Asynchrone method
+        // Use the Alamofire request method with the parameters for the HTTP request. You use the "get request" for requesting data.
+        // This Alamofire request is asynchrone
         Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
             response in // Once the HTTP request is complete, it responds with some data and the method checks if the response (using a closure) result is success or otherwise.
             if response.result.isSuccess {
                 print("Succes! Got the weather data")
+                
+                let weatherJSON : JSON = JSON(response.result.value!) // 11. Assign the response/value you get from the Alamofire request to a constant of type JSON.
+                self.updateWeatherData(json: weatherJSON) // 12.2 Call the method that updates the specified weather data.
+            
                 
             } else {
                 print("Error \(response.result.error!)")
@@ -72,6 +76,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the updateWeatherData method here:
     
+    // 12.1 Create a method that will use the weatherJSON constant from step 11 as its parameter to specify the weather data you only need.
+    func updateWeatherData(json: JSON) {
+        
+        let tempResult = json["main"]["temp"]
+    }
 
     
     
@@ -99,6 +108,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
         
         if location.horizontalAccuracy > 0 { // 7.2.2 Check if the value received by the startUpdatingLocation() method is useful
             locationManager.stopUpdatingLocation() // 7.2.3 If the value is useful immediately stop searching for GPS because it drains the battery very quick
+            locationManager.delegate = nil // 7.2.4 Immediately stop the delegate from receiving data from the web server
             
             print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")// 7.2.4 (Optional, for testing)
             
