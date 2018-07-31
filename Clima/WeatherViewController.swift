@@ -21,6 +21,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
 
     //TODO: Declare instance variables here
     let locationManager = CLLocationManager() // 3. Create the location manager object. With this manager, we can set our WeatherViewController subclass as the core location delegate, get the GPS data etc.
+    let weatherDataModel = WeatherDataModel() // 14.
 
     
     //Pre-linked IBOutlets
@@ -37,6 +38,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters // 5. Set the accuracy of the GPS signal. First think of what your app needs. For example a weather app doesn't need to be as accurate as a sport app (turn-by-turn navigations, nearest 5 meters) that tries to trace every single movement of the user.
         locationManager.requestWhenInUseAuthorization() // 6. Set the method that ask the user for authorization. For this method to popup the "allow authorization message", you need to edit the property list.
         locationManager.startUpdatingLocation() // 7.1. Set the asynchronous method that starts the process (in the background) where the location manager starts looking for the GPS coordinates.
+        
+        
+        
         
         
     }
@@ -59,6 +63,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
                 
                 let weatherJSON : JSON = JSON(response.result.value!) // 11. Assign the response/value you get from the Alamofire request to a constant of type JSON.
                 self.updateWeatherData(json: weatherJSON) // 12.2 Call the method that updates the specified weather data.
+                
             
                 
             } else {
@@ -75,11 +80,24 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
    
     
     //Write the updateWeatherData method here:
-    
+    // https://www.udemy.com/ios-11-app-development-bootcamp/learn/v4/t/lecture/7556140?start=0
     // 12.1 Create a method that will use the weatherJSON constant from step 11 as its parameter to specify the weather data you only need.
     func updateWeatherData(json: JSON) {
         
-        let tempResult = json["main"]["temp"]
+        if let tempResult = json["main"]["temp"].double {// convert to double
+        
+        // 15.
+        weatherDataModel.temprature = Int(tempResult - 273.15) // convert from Kelvin to Celsius
+        weatherDataModel.city = json["name"].stringValue
+        weatherDataModel.condition = json["weather"][0][""]["id"].intValue // convert to int
+        weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
+            
+        updateUIWithWeatherData()
+            
+        } else {
+            
+            cityLabel.text = "Weather Data Unavailbale"
+        }
     }
 
     
@@ -91,7 +109,13 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the updateUIWithWeatherData method here:
     
-    
+    // 16.
+    func updateUIWithWeatherData() {
+        
+        cityLabel.text = weatherDataModel.city
+        temperatureLabel.text = String(weatherDataModel.temprature)
+        weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
+    }
     
     
     
