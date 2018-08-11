@@ -12,7 +12,9 @@ import Alamofire // 8. Import the module/framework that allows you to send a htt
 import SwiftyJSON //
 
 // 2. Add the CLLocationManagerDelegate protocol. This makes the WeatherViewController subclass comforms to the rules of the CLLocationManagerDelegate. Now the subclass can handle location data.
-class WeatherViewController: UIViewController, CLLocationManagerDelegate {
+class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
+   
+    
     
     //Constants
     let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
@@ -38,11 +40,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters // 5. Set the accuracy of the GPS signal. First think of what your app needs. For example a weather app doesn't need to be as accurate as a sport app (turn-by-turn navigations, nearest 5 meters) that tries to trace every single movement of the user.
         locationManager.requestWhenInUseAuthorization() // 6. Set the method that ask the user for authorization. For this method to popup the "allow authorization message", you need to edit the property list.
         locationManager.startUpdatingLocation() // 7.1. Set the asynchronous method that starts the process (in the background) where the location manager starts looking for the GPS coordinates.
-        
-        
-        
-        
-        
     }
     
     
@@ -64,7 +61,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
                 let weatherJSON : JSON = JSON(response.result.value!) // 11. Assign the response/value you get from the Alamofire request to a constant of type JSON.
                 self.updateWeatherData(json: weatherJSON) // 12.2 Call the method that updates the specified weather data.
                 
-            
                 
             } else {
                 print("Error \(response.result.error!)")
@@ -166,9 +162,21 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the userEnteredANewCityName Delegate method here:
     
+    func userEnteredANewCity(city: String) {
+        print(city)
+    }
+    
 
     
     //Write the PrepareForSegue Method here
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "changeCityName" {
+            let destinationVC = segue.destination as! ChangeCityViewController
+            
+            destinationVC.delegate = self
+        }
+    }
     
     
     
