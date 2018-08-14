@@ -60,6 +60,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                 
                 let weatherJSON : JSON = JSON(response.result.value!) // 11. Assign the response/value you get from the Alamofire request to a constant of type JSON.
                 self.updateWeatherData(json: weatherJSON) // 12.2 Call the method that updates the specified weather data.
+                print(weatherJSON)
                 
                 
             } else {
@@ -84,7 +85,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         // 15.
         weatherDataModel.temprature = Int(tempResult - 273.15) // convert from Kelvin to Celsius
-        weatherDataModel.city = json["name"].stringValue
+        weatherDataModel.city = json["name"].stringValue // convert to string
         weatherDataModel.condition = json["weather"][0][""]["id"].intValue // convert to int
         weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
             
@@ -109,7 +110,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     func updateUIWithWeatherData() {
         
         cityLabel.text = weatherDataModel.city
-        temperatureLabel.text = String(weatherDataModel.temprature)
+        temperatureLabel.text = "\(weatherDataModel.temprature)º"
         weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
     }
     
@@ -163,7 +164,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //Write the userEnteredANewCityName Delegate method here:
     
     func userEnteredANewCity(city: String) {
-        print(city)
+        let params : [String : String] = ["a" : city, "appid" : APP_ID]
+        
+        getWeatherData(url: WEATHER_URL, parameters: params)
     }
     
 
